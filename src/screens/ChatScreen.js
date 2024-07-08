@@ -31,7 +31,7 @@ const ChatScreen = ({ route }) => {
   const [newMessage, setNewMessage] = useState(null);
   const [messages, setMessages] = useState([]);
   const navigation = useNavigation();
-  const [newSocket, setNewSocket] = useState(null);
+  const [socket, setSocket] = useState(null);
 
   const handleChange = (name, value) => {
     setTextMessage({ ...textMessage, [name]: value });
@@ -39,7 +39,13 @@ const ChatScreen = ({ route }) => {
 
   useEffect(() => {
     const socket = io("http://10.132.62.10:3000");
-    setNewSocket(socket);
+    setSocket(socket);
+
+    socket.emit("register", Id);
+
+    socket.on("getMessage", (newMessage) => {
+      setMessages((prev) => [...prev, newMessage]);
+    });
     return () => {
       socket.disconnect();
     };
@@ -84,21 +90,21 @@ const ChatScreen = ({ route }) => {
         return response.json();
       })
       .then((data) => {
-        console.log(data);
-        setMessages((prev) => [...prev, data]);
+        //console.log(data);
         setNewMessage(data);
-        fetchMessages();
         setTextMessage("");
+        socket.emit("chat-message", { ...data, receiverId: member });
+        fetchMessages();
       })
       .catch((err) => {
         Alert.alert(err.message);
       });
   };
-  useFocusEffect(
-    useCallback(() => {
-      fetchMessages();
-    })
-  );
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     fetchMessages();
+  //   })
+  // );
 
   return (
     <KeyboardAvoidingView

@@ -12,14 +12,13 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import { useNavigation } from "@react-navigation/native";
 import { FloatingAction } from "react-native-floating-action";
 import { useCallback, useEffect, useState } from "react";
-import { io } from "socket.io-client";
+
 import { useFocusEffect } from "@react-navigation/native";
 
 const ChatsScreen = ({ route }) => {
   const { userId, user } = route.params;
   const navigation = useNavigation();
   const [chats, setChats] = useState([]);
-  const [socket, setSocket] = useState(null);
 
   const fetchChats = async () => {
     fetch(`http://10.132.62.10:8800/api/chats/getchats/${userId}`, {
@@ -57,13 +56,6 @@ const ChatsScreen = ({ route }) => {
       fetchChats();
     }, [])
   );
-
-  useEffect(() => {
-    const socket = io("http://10.132.62.10:3000");
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
 
   return (
     <View style={styles.container}>

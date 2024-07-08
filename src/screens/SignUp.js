@@ -15,7 +15,6 @@ import ImageButton from "../../components_home/ImageButton";
 import FormField from "../../components_home/FormField";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
-import { io } from "socket.io-client";
 
 const SignUp = () => {
   const navigation = useNavigation();
@@ -79,12 +78,6 @@ const SignUp = () => {
         Alert.alert(error.message);
       });
   };
-  useEffect(() => {
-    const socket = io("http://10.132.62.10:3000");
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
 
   return (
     <View style={styles.container}>

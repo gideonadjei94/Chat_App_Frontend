@@ -14,8 +14,6 @@ import { images } from "../constants";
 import BlackButton from "../../components_home/BlackButton";
 import FormField from "../../components_home/FormField";
 import { useNavigation } from "@react-navigation/native";
-import { io } from "socket.io-client";
-//import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const SignIn = () => {
   const navigation = useNavigation();
@@ -50,13 +48,6 @@ const SignIn = () => {
         Alert.alert("Error", error.message);
       });
   };
-
-  useEffect(() => {
-    const socket = io("http://10.132.62.10:3000");
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
 
   return (
     <View style={styles.container}>
