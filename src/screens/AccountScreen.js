@@ -11,7 +11,7 @@ const AccountScreen = ({ route }) => {
     <View style={styles.container}>
       <TouchableOpacity>
         <Icon
-          name="arrow-left"
+          name="chevron-left"
           size={24}
           color="#000"
           onPress={() => navigation.goBack()}

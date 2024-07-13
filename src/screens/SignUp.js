@@ -65,14 +65,14 @@ const SignUp = () => {
     })
       .then((response) => {
         if (!response.ok) {
-          Alert.alert("Error", "Server Error");
+          throw new Error("Invalid email or password");
         }
         return response.json();
       })
       .then((data) => {
         Alert.alert("Success", "User Registered successfully");
         setUserId(data._id);
-        navigation.navigate("Chats", { userId: userId });
+        navigation.navigate("Chats", { userId: userId, user: data });
       })
       .catch((error) => {
         Alert.alert(error.message);

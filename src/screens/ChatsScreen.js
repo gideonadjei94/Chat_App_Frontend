@@ -6,13 +6,13 @@ import {
   Touchable,
   StyleSheet,
   Alert,
+  ScrollView,
 } from "react-native";
 import ChatListItem from "../components/ChatListItem";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useNavigation } from "@react-navigation/native";
 import { FloatingAction } from "react-native-floating-action";
 import { useCallback, useEffect, useState } from "react";
-
 import { useFocusEffect } from "@react-navigation/native";
 
 const ChatsScreen = ({ route }) => {
@@ -62,9 +62,9 @@ const ChatsScreen = ({ route }) => {
       <View style={styles.header}>
         <TouchableOpacity>
           <Icon
-            name="arrow-left"
+            name="chevron-left"
             size={24}
-            color="#000"
+            color="#00bfff"
             onPress={() => navigation.navigate("Main", { user: user })}
           />
         </TouchableOpacity>
@@ -73,7 +73,7 @@ const ChatsScreen = ({ route }) => {
           <Icon
             name="camera"
             size={24}
-            color="#000"
+            color="#00bfff"
             onPress={() => navigation.navigate("Camera")}
             contentContainerStyle={styles.list}
           />
@@ -84,7 +84,9 @@ const ChatsScreen = ({ route }) => {
           data={chats}
           renderItem={({ item }) =>
             item.messages !== null ? (
-              <ChatListItem chat={item} userId={userId} />
+              <ScrollView>
+                <ChatListItem chat={item} userId={userId} user={user} />
+              </ScrollView>
             ) : (
               <View />
             )

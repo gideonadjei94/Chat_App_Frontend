@@ -1,4 +1,11 @@
-import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  Button,
+} from "react-native";
 import React, { useState, useEffect } from "react";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -35,7 +42,7 @@ const CameraScreen = () => {
         <View style={styles.topBar}>
           <TouchableOpacity>
             <Icon
-              name="arrow-left"
+              name="chevron-left"
               size={24}
               color="#fff"
               onPress={() => {

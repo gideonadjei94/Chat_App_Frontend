@@ -10,7 +10,9 @@ const ChatListItem = ({ chat, userId }) => {
   const lastMessage =
     chat.messages !== null
       ? chat.messages.length > 0
-        ? chat.messages[chat.messages.length - 1].message
+        ? chat.messages[chat.messages.length - 1].isAudio
+          ? "Audio"
+          : chat.messages[chat.messages.length - 1].message
         : "Hey there! I'm using Wexy"
       : null;
 
@@ -39,7 +41,7 @@ const ChatListItem = ({ chat, userId }) => {
           </Text> */}
         </View>
         <Text numberOfLines={2} style={styles.subTitle}>
-          {lastMessage}
+          {!chat.isAudio ? lastMessage : "Audio"}
         </Text>
       </View>
     </Pressable>

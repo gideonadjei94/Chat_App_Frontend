@@ -72,7 +72,7 @@ const SettingsScreen = ({ route }) => {
       </TouchableOpacity>
       <TouchableOpacity style={styles.item} onPress={() => navigation.goBack()}>
         <Icon name="comment" size={20} color="E91E63" style={styles.icon} />
-        <Text style={styles.itemText}>Go Back</Text>
+        <Text style={styles.itemText}>Home</Text>
       </TouchableOpacity>
     </View>
   );

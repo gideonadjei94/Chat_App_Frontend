@@ -41,8 +41,11 @@ const SignIn = () => {
         return response.json();
       })
       .then((data) => {
-        Alert.alert("Success", "User Logged in Successfully");
-        navigation.navigate("Chats", { userId: data._id, user: data });
+        //Alert.alert("Success", "User Logged in Successfully");
+        navigation.navigate("Chats", {
+          userId: data.user._id,
+          user: data.user,
+        });
       })
       .catch((error) => {
         Alert.alert("Error", error.message);

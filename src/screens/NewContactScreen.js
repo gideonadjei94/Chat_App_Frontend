@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import { Ionicons, FontAwesome, MaterialIcons } from "@expo/vector-icons";
-import CountryPicker from "react-native-country-picker-modal";
+//import CountryPicker from "react-native-country-picker-modal";
 import { useNavigation } from "@react-navigation/native";
 
 const NewContactScreen = ({ route }) => {
@@ -24,7 +24,6 @@ const NewContactScreen = ({ route }) => {
   const [callingCode, setcallingCode] = useState("91");
   const [contact, setContact] = useState({
     contactNum: "",
-    username: "",
   });
   const handleChange = (name, value) => {
     setContact({ ...contact, [name]: value });
@@ -40,7 +39,7 @@ const NewContactScreen = ({ route }) => {
     })
       .then((response) => {
         if (!response.ok) {
-          throw new Error("Could not add contact");
+          throw new Error("This Contact is not on Wexy");
         }
         return response.json();
       })
@@ -56,7 +55,7 @@ const NewContactScreen = ({ route }) => {
     <View style={styles.container}>
       <View style={styles.header}>
         <Ionicons
-          name="arrow-back"
+          name="chevron-left"
           size={24}
           color="black"
           onPress={() => navigation.goBack()}
@@ -65,8 +64,8 @@ const NewContactScreen = ({ route }) => {
       </View>
       <View style={styles.form}>
         <View style={styles.inputContainer}>
-          <FontAwesome name="user" size={24} color="black" />
-          <TextInput
+          {/* <FontAwesome name="user" size={24} color="black" /> */}
+          {/* <TextInput
             style={styles.input}
             placeholder="Name"
             placeholderTextColor="#999"
@@ -74,11 +73,11 @@ const NewContactScreen = ({ route }) => {
             onChangeText={(text) => {
               handleChange("username", text);
             }}
-          />
+          /> */}
         </View>
         <View style={styles.inputContainer}>
           <MaterialIcons name="phone" size={24} color="black" />
-          <CountryPicker
+          {/* <CountryPicker
             withFilter
             countryCode={countryCode}
             withFlag
@@ -91,10 +90,10 @@ const NewContactScreen = ({ route }) => {
               setCountryCode(cca2);
               setcallingCode(callingCode[0]);
             }}
-          />
+          /> */}
           <TextInput
             style={styles.input}
-            keyboardType="name-phone-pad"
+            keyboardType="phone-pad"
             placeholder="Phone"
             value={contact.contactNum}
             placeholderTextColor="#999"
