@@ -5,12 +5,12 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import ProfileView from "../ProfileView";
 dayjs.extend(relativeTime);
 
-const ChatListItem = ({ chat, userId }) => {
+const ChatListItem = ({ chat, userId, user }) => {
   const navigation = useNavigation();
   const lastMessage =
     chat.messages !== null
       ? chat.messages.length > 0
-        ? chat.messages[chat.messages.length - 1].isAudio
+        ? chat.messages[chat.messages.length - 1].type === "audio"
           ? "Audio"
           : chat.messages[chat.messages.length - 1].message
         : "Hey there! I'm using Wexy"
@@ -24,6 +24,7 @@ const ChatListItem = ({ chat, userId }) => {
           name: chat.username,
           Id: userId,
           member: chat.member,
+          user: user,
         })
       }
       style={styles.container}

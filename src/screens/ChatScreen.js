@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -24,13 +24,14 @@ import { useFocusEffect } from "@react-navigation/native";
 import { Audio } from "expo-av";
 import AudioList from "../components/AudioList";
 import { FontAwesome5 } from "@expo/vector-icons";
+import * as DocumentPicker from "expo-document-picker";
 
 const ChatScreen = ({ route }) => {
   const { chatId, name, Id, member, user } = route.params;
   //const [send, setSend] = useState(false);
   const [textMessage, setTextMessage] = useState({
     message: "",
-    isAudio: false,
+    type: "text",
   });
   const [newMessage, setNewMessage] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -38,6 +39,7 @@ const ChatScreen = ({ route }) => {
   const [socket, setSocket] = useState(null);
   const [recording, setRecording] = useState();
   const [permissionResponse, requestPermission] = Audio.usePermissions();
+  const scrollViewRef = useRef();
 
   const handleChange = (name, value) => {
     setTextMessage({ ...textMessage, [name]: value });
@@ -56,6 +58,12 @@ const ChatScreen = ({ route }) => {
       socket.disconnect();
     };
   }, []);
+
+  useEffect(() => {
+    if (scrollViewRef.current) {
+      scrollViewRef.current.scrollToEnd({ animated: true });
+    }
+  }, [messages]);
 
   // start recording
   const startRecording = async () => {
@@ -148,7 +156,7 @@ const ChatScreen = ({ route }) => {
       },
       body: JSON.stringify({
         message: uri,
-        isAudio: true,
+        type: "audio",
       }),
     })
       .then((response) => {
@@ -160,7 +168,7 @@ const ChatScreen = ({ route }) => {
       .then((data) => {
         //console.log(data);
         setNewMessage(data);
-        setTextMessage({ message: "", isAudio: false });
+        setTextMessage({ message: "", type: "text" });
         socket.emit("chat-message", { ...data, receiverId: member });
         fetchMessages();
       })
@@ -169,9 +177,66 @@ const ChatScreen = ({ route }) => {
       });
   };
 
+  const handleLongPress = (messageId) => {
+    Alert.alert(
+      "Delete Message",
+      "Are you sure you want to delete this message?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => deleteMessage(messageId),
+        },
+      ]
+    );
+  };
+
+  const deleteMessage = async (messageId) => {
+    fetch(
+      `http://10.132.62.10:8800/api/messages/delete/${Id}/${chatId}/${messageId}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    )
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Could not delete message");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        Alert.alert("Message deleted");
+        fetchMessages();
+      })
+      .catch((err) => {
+        Alert.alert(err.message);
+      });
+  };
+
+  const pickDocument = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({ type: "*/*" }); // Pick any type of file
+
+      if (result.type === "success") {
+        // Handle the selected document
+        console.log(result.uri);
+        // Example: You can save it to media state or handle it as needed
+        //setMedia([...media, { uri: result.uri }]); // Adding selected media to state
+      }
+    } catch (error) {
+      console.log("Document picker error:", error);
+    }
+  };
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      //behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={styles.bg}
     >
       <View style={styles.header}>
@@ -221,20 +286,24 @@ const ChatScreen = ({ route }) => {
           <FlatList
             data={messages}
             renderItem={({ item }) =>
-              !item.isAudio ? (
-                <Message
-                  message={item}
-                  userId={Id}
-                  name={name}
-                  style={styles.list}
-                />
+              item.type === "text" ? (
+                <TouchableOpacity onLongPress={() => handleLongPress(item._id)}>
+                  <Message
+                    message={item}
+                    userId={Id}
+                    name={name}
+                    style={styles.list}
+                  />
+                </TouchableOpacity>
               ) : (
-                <AudioList
-                  uri={item.message}
-                  message={item}
-                  userId={Id}
-                  user={user}
-                />
+                <TouchableOpacity onLongPress={() => handleLongPress(item._id)}>
+                  <AudioList
+                    uri={item.message}
+                    message={item}
+                    userId={Id}
+                    user={user}
+                  />
+                </TouchableOpacity>
               )
             }
             keyExtractor={(item) => item._id}
@@ -251,8 +320,18 @@ const ChatScreen = ({ route }) => {
               recording ? "Recording message..." : "Type your message..."
             }
           />
-          <FontAwesome5 name="paperclip" size={22} color="gray" />
-          <FontAwesome5 name="image" size={22} color="gray" />
+          <FontAwesome5
+            name="paperclip"
+            size={22}
+            color="gray"
+            onPress={pickDocument}
+          />
+          <FontAwesome5
+            name="image"
+            size={22}
+            color="gray"
+            onPress={() => navigation.navigate("Media")}
+          />
           {textMessage.message ? (
             <FontAwesome5
               name="paper-plane"
@@ -297,7 +376,7 @@ const styles = StyleSheet.create({
   headerIcons: {
     flexDirection: "row",
     justifyContent: "space-between",
-    width: 150,
+    width: 115,
   },
   container: {
     backgroundColor: "white",

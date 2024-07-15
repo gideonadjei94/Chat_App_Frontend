@@ -14,7 +14,7 @@ const AudioList = ({ uri, message, userId, user }) => {
     console.log("Loading Sound");
     const { sound } = await Audio.Sound.createAsync(
       { uri },
-      undefined,
+      { shouldPlay: true },
       pbStatusUpdate
     );
     setSound(sound);
@@ -73,7 +73,7 @@ const AudioList = ({ uri, message, userId, user }) => {
         <View
           style={[styles.playbackIndicator, { left: `${progress * 100}%` }]}
         />
-        {/* <ProfileView name={user?.username} /> */}
+
         <Text
           style={{
             position: "absolute",

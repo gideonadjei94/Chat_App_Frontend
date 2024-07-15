@@ -6,74 +6,136 @@ import {
   Image,
   Button,
 } from "react-native";
-import React, { useState, useEffect } from "react";
-import { CameraView, useCameraPermissions } from "expo-camera";
+import React, { useState, useEffect, useRef } from "react";
+import { Camera, CameraType } from "expo-camera/legacy";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useNavigation } from "@react-navigation/native";
+import * as MediaLibrary from "expo-media-library";
+import { FontAwesome5 } from "@expo/vector-icons";
 
 const CameraScreen = () => {
   const navigation = useNavigation();
-  const [facing, setFacing] = useState("back");
-  const [permission, requestPermission] = useCameraPermissions();
+  const [hasPersmission, setHasPermission] = useState(null);
+  const [image, setImage] = useState(null);
+  const [type, setType] = useState(Camera.Constants.Type.back);
+  const [flash, setFlash] = useState(Camera.Constants.FlashMode.off);
+  const cameraRef = useRef(null);
 
-  if (!permission) {
-    // Camera permissions are still loading.
-    return <View />;
-  }
+  useEffect(() => {
+    (async () => {
+      MediaLibrary.requestPermissionsAsync();
+      const cameraStatus = await Camera.requestCameraPermissionsAsync();
+      setHasPermission(cameraStatus.status === "granted");
+    })();
+  }, []);
 
-  if (!permission.granted) {
-    // Camera permissions are not granted yet.
-    return (
-      <View style={styles.container}>
-        <Text style={{ textAlign: "center" }}>
-          We need your permission to show the camera
-        </Text>
-        <Button onPress={requestPermission} title="grant permission" />
-      </View>
-    );
-  }
-  function toggleCameraFacing() {
-    setFacing((current) => (current === "back" ? "front" : "back"));
+  const takePicture = async () => {
+    if (cameraRef.current) {
+      try {
+        const data = await cameraRef.current.takePictureAsync();
+        setImage(data.uri);
+      } catch (error) {
+        console.log(error.message);
+      }
+    }
+  };
+
+  const savePicture = async () => {
+    if (image) {
+      try {
+        await MediaLibrary.createAssetAsync(image);
+        alert("Picture Saved..");
+        setImage(null);
+      } catch (error) {
+        console.log(error.message);
+      }
+    }
+  };
+
+  if (hasPersmission === false) {
+    return <Text>No Access to camera</Text>;
   }
 
   return (
     <View style={styles.container}>
-      <CameraView style={styles.absoluteFill} facing={facing}>
-        <View style={styles.topBar}>
-          <TouchableOpacity>
-            <Icon
-              name="chevron-left"
-              size={24}
-              color="#fff"
+      {!image ? (
+        <Camera
+          type={type}
+          FlashMode={flash}
+          ref={cameraRef}
+          style={styles.camera}
+        >
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              padding: 30,
+            }}
+          >
+            <FontAwesome5
+              name="retweet"
+              size={30}
+              color="white"
               onPress={() => {
-                navigation.goBack();
+                setType(
+                  type === CameraType.back ? CameraType.front : CameraType.back
+                );
               }}
             />
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <Icon name="bolt" size={24} color="#fff" />
-          </TouchableOpacity>
-        </View>
-        <TouchableOpacity
-          style={styles.cameraButton}
-          onPress={toggleCameraFacing}
-        >
-          <Icon name="camera-reverse" size={24} color="white" />
-        </TouchableOpacity>
-        <View styles={styles.bottomBar}>
-          <TouchableOpacity style={styles.iconButton}>
-            <Icon name="image" size={30} color="#fff" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.captureButton}>
-            <Icon
-              name="circle"
+            <FontAwesome5
+              name="bolt"
               size={30}
-              color="#fff"
-              onPress={toggleCameraFacing}
+              color={
+                flash === Camera.Constants.FlashMode.off ? "gray" : "white"
+              }
+              onPress={() => {
+                setFlash(
+                  flash === Camera.Constants.FlashMode.off
+                    ? Camera.Constants.FlashMode.on
+                    : Camera.Constants.FlashMode.off
+                );
+              }}
             />
+          </View>
+          <View style={styles.CaptureBg}>
+            <View style={styles.Capture}>
+              <FontAwesome5
+                name="camera"
+                size={40}
+                color="black"
+                onPress={takePicture}
+              />
+            </View>
+          </View>
+        </Camera>
+      ) : (
+        <View style={styles.container}>
+          <Image source={{ uri: image }} style={styles.camera} />
+          <TouchableOpacity onPress={() => setImage(null)}>
+            <View style={styles.BL}>
+              <FontAwesome5 name="retweet" size={30} color="white" />
+              <Text style={{ fontSize: 18, color: "white", marginLeft: 5 }}>
+                Re-take
+              </Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={savePicture}>
+            <View style={styles.BR}>
+              <FontAwesome5 name="check" size={26} color="white" />
+              <Text
+                style={{
+                  fontSize: 18,
+                  color: "white",
+                  marginLeft: 5,
+                  marginRight: 30,
+                }}
+              >
+                Save
+              </Text>
+            </View>
           </TouchableOpacity>
         </View>
-      </CameraView>
+      )}
     </View>
   );
 };
@@ -81,31 +143,59 @@ const CameraScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "black",
+    backgroundColor: "#000",
+    justifyContent: "center",
   },
-  topBar: {
+  camera: {
+    flex: 1,
+    borderRadius: 5,
+  },
+  CaptureBg: {
+    height: 80,
+    width: 80,
+    flexDirection: "column",
+    top: "75%",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "white",
+    borderRadius: 50,
+    left: "40%",
+    borderColor: "red",
+  },
+  Capture: {
+    height: 70,
+    width: 70,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "transparent",
+    borderRadius: 50,
+  },
+  BL: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    padding: 20,
-  },
-  bottomBar: {
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "black",
+    height: 50,
+    width: "48%",
+    marginLeft: 5,
+    marginBottom: 15,
+    alignSelf: "flex-start",
     position: "absolute",
     bottom: 0,
-    width: "100%",
+    borderRadius: 10,
+  },
+  BR: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    padding: 20,
-  },
-  iconButton: {
     justifyContent: "center",
     alignItems: "center",
-  },
-  captureButton: {
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  absoluteFill: {
-    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "black",
+    height: 50,
+    width: "48%",
+    marginBottom: 15,
+    alignSelf: "flex-end",
+    position: "absolute",
+    bottom: 0,
+    borderRadius: 10,
   },
 });
 
