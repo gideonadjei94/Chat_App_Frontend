@@ -39,6 +39,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "whitesmoke",
     justifyContent: "center",
-    paddingTop: 30,
+    paddingTop: 40,
   },
 });

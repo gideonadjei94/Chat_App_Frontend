@@ -27,18 +27,13 @@ const AudioList = ({ uri, message, userId, user }) => {
     setStatus(AVPlaybackStatus);
     console.log(AVPlaybackStatus);
   };
-  const isPlaying = status?.isLoaded ? status?.isPlaying : false;
-
-  const position = status?.isLoaded ? status?.positionMillis : 0;
-  const duration = status?.isLoaded ? status?.durationMillis : 1;
-
-  let progress;
-  if (status?.didJustFinish) {
-    progress = 0;
-  } else {
-    progress = position / duration;
-  }
-
+  const isPlaying = AVPlaybackStatus?.isLoaded
+    ? AVPlaybackStatus?.isPlaying
+    : false;
+  const duration = AVPlaybackStatus?.durationMillis || 1;
+  // const position = AVPlaybackStatus?.isLoaded
+  //   ? AVPlaybackStatus?.positionMillis
+  //   : 0;
   useEffect(() => {
     return sound
       ? () => {
@@ -64,15 +59,17 @@ const AudioList = ({ uri, message, userId, user }) => {
     >
       <FontAwesome5
         name={isPlaying ? "pause" : "play"}
-        size={20}
+        size={30}
         color={"gray"}
         onPress={playSound}
       />
       <View style={styles.playbackContainer}>
-        <View style={styles.playbackBackground} />
+        <Text styles={styles.playbackBackground}>Audio</Text>
+
+        {/* <View style={styles.playbackBackground} />
         <View
           style={[styles.playbackIndicator, { left: `${progress * 100}%` }]}
-        />
+        /> */}
 
         <Text
           style={{
@@ -82,7 +79,7 @@ const AudioList = ({ uri, message, userId, user }) => {
             color: "gray",
           }}
         >
-          {isPlaying ? formatMillis(position) : formatMillis(duration)}
+          {formatMillis(duration)}
         </Text>
       </View>
     </View>
@@ -96,11 +93,11 @@ const styles = StyleSheet.create({
     margin: 5,
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 15,
+    paddingHorizontal: 12,
     paddingVertical: 5,
     borderRadius: 10,
     gap: 15,
-    maxWidth: "78%",
+    maxWidth: "30%",
     shadowColor: "#000",
     shadowOffset: {
       width: 0,

@@ -11,6 +11,7 @@ import {
   Alert,
   ScrollView,
   TextInput,
+  Image,
 } from "react-native";
 import bg from "../../assets/images1/ViberIcon.jpg";
 
@@ -25,6 +26,7 @@ import { Audio } from "expo-av";
 import AudioList from "../components/AudioList";
 import { FontAwesome5 } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
+import MediaList from "../components/MediaList";
 
 const ChatScreen = ({ route }) => {
   const { chatId, name, Id, member, user } = route.params;
@@ -96,7 +98,7 @@ const ChatScreen = ({ route }) => {
       allowsRecordingIOS: false,
     });
     const uri = recording.getURI();
-    sendAudio(uri);
+    upLoadAudio(uri);
     //console.log("Recording stopped and stored at", uri);
   };
   const fetchMessages = async () => {
@@ -121,7 +123,7 @@ const ChatScreen = ({ route }) => {
   };
   useEffect(() => {
     fetchMessages();
-  }, []);
+  }, [navigation]);
 
   const sendMessage = async () => {
     fetch(`http://10.132.62.10:8800/api/messages/create/${Id}/${member}`, {
@@ -176,6 +178,35 @@ const ChatScreen = ({ route }) => {
         Alert.alert(err.message);
       });
   };
+  const upLoadAudio = async (uri) => {
+    const formData = new FormData();
+    formData.append("file", {
+      uri,
+      name: "audio.m4a",
+      type: "audio/m4a",
+    });
+
+    fetch("http://10.132.62.10:8800/api/user/upload", {
+      method: "POST",
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+      body: formData,
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Could not upload file");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        const audioUri = `http://10.132.62.10:8800/api/user/audio/${data.file.filename}`;
+        sendAudio(audioUri);
+      })
+      .catch((error) => {
+        console.log(error.message);
+      });
+  };
 
   const handleLongPress = (messageId) => {
     Alert.alert(
@@ -225,8 +256,9 @@ const ChatScreen = ({ route }) => {
       const result = await DocumentPicker.getDocumentAsync({ type: "*/*" }); // Pick any type of file
 
       if (result.type === "success") {
+        Alert.alert(result.uri);
         // Handle the selected document
-        console.log(result.uri);
+        // console.log(result.uri);
         // Example: You can save it to media state or handle it as needed
         //setMedia([...media, { uri: result.uri }]); // Adding selected media to state
       }
@@ -234,6 +266,12 @@ const ChatScreen = ({ route }) => {
       console.log("Document picker error:", error);
     }
   };
+  useFocusEffect(
+    useCallback(() => {
+      fetchMessages();
+    }, [])
+  );
+
   return (
     <KeyboardAvoidingView
       //behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -295,7 +333,7 @@ const ChatScreen = ({ route }) => {
                     style={styles.list}
                   />
                 </TouchableOpacity>
-              ) : (
+              ) : item.type === "audio" ? (
                 <TouchableOpacity onLongPress={() => handleLongPress(item._id)}>
                   <AudioList
                     uri={item.message}
@@ -304,6 +342,13 @@ const ChatScreen = ({ route }) => {
                     user={user}
                   />
                 </TouchableOpacity>
+              ) : (
+                <MediaList
+                  uri={item.message}
+                  message={item}
+                  userId={Id}
+                  user={user}
+                />
               )
             }
             keyExtractor={(item) => item._id}
@@ -330,7 +375,9 @@ const ChatScreen = ({ route }) => {
             name="image"
             size={22}
             color="gray"
-            onPress={() => navigation.navigate("Media")}
+            onPress={() =>
+              navigation.navigate("Media", { chatId, name, Id, member, user })
+            }
           />
           {textMessage.message ? (
             <FontAwesome5

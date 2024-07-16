@@ -8,20 +8,13 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import { Ionicons, FontAwesome, MaterialIcons } from "@expo/vector-icons";
-//import CountryPicker from "react-native-country-picker-modal";
+import { FontAwesome5 } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 
 const NewContactScreen = ({ route }) => {
   const { user } = route.params;
   const navigation = useNavigation();
-  const [countryCode, setCountryCode] = useState("IN");
-  const [country, setCountry] = useState(null);
-  const [withCountryNameButton, setWithCountryNameButton] = useState(false);
-  const [withFlag, setWithFlag] = useState(true);
-  const [withEmoji, setWithEmoji] = useState(true);
-  const [withFilter, setWithFilter] = useState(true);
-  const [withAlphaFilter, setWithAlphaFilter] = useState(true);
-  const [callingCode, setcallingCode] = useState("91");
+
   const [contact, setContact] = useState({
     contactNum: "",
   });
@@ -54,7 +47,7 @@ const NewContactScreen = ({ route }) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Ionicons
+        <FontAwesome5
           name="chevron-left"
           size={24}
           color="black"
@@ -63,34 +56,10 @@ const NewContactScreen = ({ route }) => {
         <Text style={styles.headerTitle}>New Contact</Text>
       </View>
       <View style={styles.form}>
-        <View style={styles.inputContainer}>
-          {/* <FontAwesome name="user" size={24} color="black" /> */}
-          {/* <TextInput
-            style={styles.input}
-            placeholder="Name"
-            placeholderTextColor="#999"
-            value={contact.username}
-            onChangeText={(text) => {
-              handleChange("username", text);
-            }}
-          /> */}
-        </View>
+        <View style={styles.inputContainer}></View>
         <View style={styles.inputContainer}>
           <MaterialIcons name="phone" size={24} color="black" />
-          {/* <CountryPicker
-            withFilter
-            countryCode={countryCode}
-            withFlag
-            withAlphaFilter={false}
-            withCurrencyButton={false}
-            withCallingCode
-            onSelect={(country) => {
-              console.log("country", country);
-              const { cca2, callingCode } = country;
-              setCountryCode(cca2);
-              setcallingCode(callingCode[0]);
-            }}
-          /> */}
+
           <TextInput
             style={styles.input}
             keyboardType="phone-pad"

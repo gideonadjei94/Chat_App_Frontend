@@ -20,6 +20,7 @@ import DeleteAccountScreen from "../screens/DeleteAccountScreen";
 import ConfirmDeleteScreen from "../screens/ConfirmDeleteScreen";
 import NewContactScreen from "../screens/NewContactScreen";
 import MediaScreen from "../components/MediaScreen";
+import FullMedia from "../components/FullMedia";
 
 const Stack = createStackNavigator();
 
@@ -124,6 +125,11 @@ const AuthLayout = () => {
       <Stack.Screen
         name="Media"
         component={MediaScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Full"
+        component={FullMedia}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

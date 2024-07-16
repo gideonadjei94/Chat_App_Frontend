@@ -12,6 +12,8 @@ const ChatListItem = ({ chat, userId, user }) => {
       ? chat.messages.length > 0
         ? chat.messages[chat.messages.length - 1].type === "audio"
           ? "Audio"
+          : chat.messages[chat.messages.length - 1].type === "media"
+          ? "Photo"
           : chat.messages[chat.messages.length - 1].message
         : "Hey there! I'm using Wexy"
       : null;
