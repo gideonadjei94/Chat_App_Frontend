@@ -46,6 +46,7 @@ const SignIn = () => {
           userId: data.user._id,
           user: data.user,
         });
+        setForm("");
       })
       .catch((error) => {
         Alert.alert("Error", error.message);

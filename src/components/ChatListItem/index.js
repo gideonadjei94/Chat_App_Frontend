@@ -31,7 +31,7 @@ const ChatListItem = ({ chat, userId, user }) => {
       }
       style={styles.container}
     >
-      <ProfileView name={chat.username} />
+      <ProfileView name={chat.username} width={50} height={50} />
       <View style={styles.content}>
         <View style={styles.row}>
           <Text style={styles.name} numberOfLines={1}>

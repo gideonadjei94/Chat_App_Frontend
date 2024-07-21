@@ -19,10 +19,10 @@ const AccountScreen = ({ route }) => {
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.item}
-        onPress={() => navigation.navigate("Privacy")}
+        onPress={() => navigation.navigate("SignIn")}
       >
-        <Icon name="lock" size={20} color="#000" style={styles.icon} />
-        <Text style={styles.itemText}>Privacy</Text>
+        <Icon name="sign-out" size={20} color="#000" style={styles.icon} />
+        <Text style={styles.itemText}>Logout</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.item}

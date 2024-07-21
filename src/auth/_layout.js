@@ -21,6 +21,7 @@ import ConfirmDeleteScreen from "../screens/ConfirmDeleteScreen";
 import NewContactScreen from "../screens/NewContactScreen";
 import MediaScreen from "../components/MediaScreen";
 import FullMedia from "../components/FullMedia";
+import StoryMediaScreen from "../components/StoryMediaScreen";
 
 const Stack = createStackNavigator();
 
@@ -130,6 +131,11 @@ const AuthLayout = () => {
       <Stack.Screen
         name="Full"
         component={FullMedia}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="StoryMedia"
+        component={StoryMediaScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

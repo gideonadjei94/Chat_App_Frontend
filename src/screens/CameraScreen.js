@@ -73,6 +73,12 @@ const CameraScreen = () => {
             }}
           >
             <FontAwesome5
+              name="chevron-left"
+              size={30}
+              color="#fff"
+              onPress={() => navigation.goBack()}
+            />
+            <FontAwesome5
               name="retweet"
               size={30}
               color="white"

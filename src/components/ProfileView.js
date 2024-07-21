@@ -19,12 +19,18 @@ const getRandomColor = (str) => {
   return color;
 };
 
-const ProfileView = ({ name }) => {
+const ProfileView = ({ name, width, height }) => {
   const initials = getInitials(name);
   const bgColor = getRandomColor(name);
 
   return (
-    <View style={[styles.profileContainer, { backgroundColor: bgColor }]}>
+    <View
+      style={[
+        styles.profileContainer,
+        { backgroundColor: bgColor },
+        { width: width, height: height },
+      ]}
+    >
       <Text style={styles.initials}>{initials}</Text>
     </View>
   );
@@ -32,8 +38,6 @@ const ProfileView = ({ name }) => {
 
 const styles = StyleSheet.create({
   profileContainer: {
-    width: 50,
-    height: 50,
     borderRadius: 25,
     justifyContent: "center",
     alignItems: "center",

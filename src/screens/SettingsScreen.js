@@ -17,7 +17,7 @@ const SettingsScreen = ({ route }) => {
   return (
     <View style={styles.container}>
       <View style={styles.profileContainer}>
-        <ProfileView name={user.username} />
+        <ProfileView name={user.username} width={55} height={55} />
         <View>
           <Text style={styles.profileName}>{user.username}</Text>
           <Text style={styles.profileRole}>Hey There! I'm using Wexy</Text>
@@ -65,7 +65,7 @@ const SettingsScreen = ({ route }) => {
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.item}
-        onPress={() => navigation.navigate("Help")}
+        onPress={() => navigation.navigate("Media", { user })}
       >
         <Icon name="image" size={20} color="#2196F3" style={styles.icon} />
         <Text style={styles.itemText}>Media</Text>

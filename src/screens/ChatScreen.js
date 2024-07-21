@@ -27,6 +27,7 @@ import AudioList from "../components/AudioList";
 import { FontAwesome5 } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
 import MediaList from "../components/MediaList";
+import * as FileSystem from "expo-file-system";
 
 const ChatScreen = ({ route }) => {
   const { chatId, name, Id, member, user } = route.params;
@@ -255,13 +256,13 @@ const ChatScreen = ({ route }) => {
     try {
       const result = await DocumentPicker.getDocumentAsync({ type: "*/*" }); // Pick any type of file
 
-      if (result.type === "success") {
-        Alert.alert(result.uri);
-        // Handle the selected document
-        // console.log(result.uri);
-        // Example: You can save it to media state or handle it as needed
-        //setMedia([...media, { uri: result.uri }]); // Adding selected media to state
-      }
+      // if (result.type === "success") {
+      Alert.alert(result);
+      // Handle the selected document
+      // console.log(result.uri);
+      // Example: You can save it to media state or handle it as needed
+      //setMedia([...media, { uri: result.uri }]); // Adding selected media to state
+      // }
     } catch (error) {
       console.log("Document picker error:", error);
     }
