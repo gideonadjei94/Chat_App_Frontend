@@ -11,26 +11,37 @@ const AudioList = ({ uri, message, userId, user }) => {
     return message.senderId === userId && message.receiverId !== userId;
   };
   const playSound = async () => {
-    console.log("Loading Sound");
-    const { sound } = await Audio.Sound.createAsync(
-      { uri },
-      { shouldPlay: true },
-      pbStatusUpdate
-    );
-    setSound(sound);
+    try {
+      console.log("Loading Sound");
+      const { sound } = await Audio.Sound.createAsync(
+        { uri: uri },
+        { shouldPlay: true, progressUpdateIntervalMillis: 1000 }
+      );
+      setSound(sound);
+      sound.setOnPlaybackStatusUpdate(pbStatusUpdate);
 
-    console.log("Playing Sound");
-    await sound.playAsync();
+      console.log("Playing Sound");
+      await sound.playAsync();
+    } catch (error) {
+      console.log("Error loading file", error.message);
+    }
   };
 
+  // const onPlaybackStatusUpdate = (status) => {
+  //   console.log(status);
+  //   if (status?.isLoaded) {
+  //     setIsPlaying(status?.isPlaying);
+  //     setDuration(status?.durationMillis);
+  //   } else if (status.error) {
+  //     console.log("Error with playback:", status.error);
+  //   }
+  // };
   const pbStatusUpdate = async (AVPlaybackStatus) => {
     setStatus(AVPlaybackStatus);
     console.log(AVPlaybackStatus);
   };
-  const isPlaying = AVPlaybackStatus?.isLoaded
-    ? AVPlaybackStatus?.isPlaying
-    : false;
-  const duration = AVPlaybackStatus?.durationMillis || 1;
+  const isPlaying = status?.isLoaded ? status?.isPlaying : false;
+  const duration = status?.durationMillis || 1;
   // const position = AVPlaybackStatus?.isLoaded
   //   ? AVPlaybackStatus?.positionMillis
   //   : 0;
@@ -42,6 +53,7 @@ const AudioList = ({ uri, message, userId, user }) => {
         }
       : undefined;
   }, [sound]);
+
   const formatMillis = (number) => {
     const minutes = Math.floor(number / (1000 * 60));
     const seconds = Math.floor((number % (1000 * 60)) / 1000);

@@ -12,6 +12,7 @@ import {
 import * as MediaLibrary from "expo-media-library";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import { Backend_URL } from "../auth/config";
 // import * as FileSystem from "expo-file-system";
 
 const StoryMediaScreen = ({ route }) => {
@@ -52,14 +53,14 @@ const StoryMediaScreen = ({ route }) => {
   const handleLongPress = (uri) => {
     Alert.alert(
       "Send Media",
-      "Tap on SEND to send media",
+      "Tap on POST to post a story",
       [
         {
           text: "Cancel",
           style: "cancel",
         },
         {
-          text: "Send",
+          text: "Post",
           onPress: () => upLoadStory(uri),
         },
       ],
@@ -74,7 +75,7 @@ const StoryMediaScreen = ({ route }) => {
       type: uri.endsWith(".mp4") ? "video/mp4" : "image/jpeg",
     });
     formData.append("userId", user._id);
-    fetch("http://10.132.62.10:8800/api/stories/upload", {
+    fetch(`${Backend_URL}stories/upload`, {
       method: "POST",
       headers: {
         "Content-Type": "multipart/form-data",
@@ -90,10 +91,10 @@ const StoryMediaScreen = ({ route }) => {
         }
       })
       .then((data) => {
-        const mediaUri = `http://10.132.62.10:8800/api/stories/download/${data.file.filename}`;
+        //const mediaUri = `http://10.132.62.10:8800/api/stories/download/${data.file.filename}`;
       })
       .catch((error) => {
-        console.log(error.message);
+        console.log("Uploading error", error.message);
       });
   };
   return (
@@ -115,6 +116,9 @@ const StoryMediaScreen = ({ route }) => {
             <TouchableOpacity
               onLongPress={() => {
                 handleLongPress(item.uri);
+              }}
+              onPress={() => {
+                navigation.navigate("Full", { uri: item.uri });
               }}
             >
               <Image source={{ uri: item.uri }} style={styles.mediaItem} />

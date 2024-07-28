@@ -14,6 +14,7 @@ import { images } from "../constants";
 import BlackButton from "../../components_home/BlackButton";
 import FormField from "../../components_home/FormField";
 import { useNavigation } from "@react-navigation/native";
+import { Backend_URL } from "../auth/config";
 
 const SignIn = () => {
   const navigation = useNavigation();
@@ -27,7 +28,7 @@ const SignIn = () => {
   };
 
   const loginUser = async () => {
-    await fetch("http://10.132.62.10:8800/api/user/login", {
+    await fetch(`${Backend_URL}user/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

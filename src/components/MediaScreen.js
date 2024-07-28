@@ -13,6 +13,7 @@ import * as MediaLibrary from "expo-media-library";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 // import * as FileSystem from "expo-file-system";
+import { Backend_URL } from "../auth/config";
 
 const MediaScreen = ({ route }) => {
   const { chatId, name, Id, member, user } = route.params;
@@ -73,7 +74,7 @@ const MediaScreen = ({ route }) => {
       name: uri.split("/").pop(),
       type: uri.endsWith(".mp4") ? "video/mp4" : "image/jpeg",
     });
-    fetch("http://10.132.62.10:8800/api/user/upload", {
+    fetch(`${Backend_URL}user/upload`, {
       method: "POST",
       headers: {
         "Content-Type": "multipart/form-data",
@@ -87,7 +88,7 @@ const MediaScreen = ({ route }) => {
         return response.json();
       })
       .then((data) => {
-        const mediaUri = `http://10.132.62.10:8800/api/user/audio/${data.file.filename}`;
+        const mediaUri = `${Backend_URL}user/audio/${data.file.filename}`;
         sendMedia(mediaUri);
       })
       .catch((error) => {
@@ -95,7 +96,7 @@ const MediaScreen = ({ route }) => {
       });
   };
   const sendMedia = async (uri) => {
-    fetch(`http://10.132.62.10:8800/api/messages/create/${Id}/${member}`, {
+    fetch(`${Backend_URL}messages/create/${Id}/${member}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -145,6 +146,7 @@ const MediaScreen = ({ route }) => {
               onLongPress={() => {
                 handleLongPress(item.uri);
               }}
+              onPress={() => navigation.navigate("Full", { uri: item.uri })}
             >
               <Image source={{ uri: item.uri }} style={styles.mediaItem} />
             </TouchableOpacity>

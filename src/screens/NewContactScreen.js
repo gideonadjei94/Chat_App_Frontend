@@ -10,6 +10,7 @@ import React, { useState } from "react";
 import { Ionicons, FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import { Backend_URL } from "../auth/config";
 
 const NewContactScreen = ({ route }) => {
   const { user } = route.params;
@@ -23,7 +24,7 @@ const NewContactScreen = ({ route }) => {
   };
 
   const addcontact = async () => {
-    fetch(`http://10.132.62.10:8800/api/user/addcontact/${user._id}`, {
+    fetch(`${Backend_URL}user/addcontact/${user._id}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

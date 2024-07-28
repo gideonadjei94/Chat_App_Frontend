@@ -27,7 +27,8 @@ import AudioList from "../components/AudioList";
 import { FontAwesome5 } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
 import MediaList from "../components/MediaList";
-import * as FileSystem from "expo-file-system";
+import axios from "axios";
+import { Backend_URL, Api } from "../auth/config";
 
 const ChatScreen = ({ route }) => {
   const { chatId, name, Id, member, user } = route.params;
@@ -49,7 +50,7 @@ const ChatScreen = ({ route }) => {
   };
 
   useEffect(() => {
-    const socket = io("http://10.132.62.10:3000");
+    const socket = io(`${Api}:3000`);
     setSocket(socket);
 
     socket.emit("register", Id);
@@ -103,7 +104,7 @@ const ChatScreen = ({ route }) => {
     //console.log("Recording stopped and stored at", uri);
   };
   const fetchMessages = async () => {
-    fetch(`http://10.132.62.10:8800/api/messages/getmessages/${Id}/${chatId}`, {
+    fetch(`${Backend_URL}messages/getmessages/${Id}/${chatId}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -127,7 +128,7 @@ const ChatScreen = ({ route }) => {
   }, [navigation]);
 
   const sendMessage = async () => {
-    fetch(`http://10.132.62.10:8800/api/messages/create/${Id}/${member}`, {
+    fetch(`${Backend_URL}messages/create/${Id}/${member}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -152,7 +153,7 @@ const ChatScreen = ({ route }) => {
       });
   };
   const sendAudio = async (uri) => {
-    fetch(`http://10.132.62.10:8800/api/messages/create/${Id}/${member}`, {
+    fetch(`${Backend_URL}messages/create/${Id}/${member}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -187,7 +188,7 @@ const ChatScreen = ({ route }) => {
       type: "audio/m4a",
     });
 
-    fetch("http://10.132.62.10:8800/api/user/upload", {
+    fetch(`${Backend_URL}user/upload`, {
       method: "POST",
       headers: {
         "Content-Type": "multipart/form-data",
@@ -196,7 +197,7 @@ const ChatScreen = ({ route }) => {
     })
       .then((response) => {
         if (!response.ok) {
-          throw new Error("Could not upload file");
+          throw new Error("Could not upload audio");
         }
         return response.json();
       })
@@ -206,6 +207,77 @@ const ChatScreen = ({ route }) => {
       })
       .catch((error) => {
         console.log(error.message);
+      });
+  };
+
+  const upLoadFile = async (uri, name, type) => {
+    const formData = new FormData();
+    formData.append("file", {
+      uri,
+      name: name,
+      type: type,
+    });
+    try {
+      const response = await axios.post(`${Backend_URL}user/upload`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      const data = response.data;
+      const fileUri = `${Backend_URL}user/audio/${data.file.filename}`;
+      sendFile(fileUri);
+    } catch (error) {
+      console.error("File upload error", error.message);
+    }
+
+    // fetch("http://10.132.62.10:8800/api/user/upload", {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "multipart/form-data",
+    //   },
+    //   body: formData,
+    // })
+    //   .then((response) => {
+    //     if (!response.ok) {
+    //       throw new Error("Could not upload file");
+    //     }
+    //     return response.json();
+    //   })
+    //   .then((data) => {
+    //     const fileUri = `http://10.132.62.10:8800/api/user/audio/${data.file.filename}`;
+    //     sendFile(fileUri);
+    //   })
+    //   .catch((error) => {
+    //     console.log(error.message);
+    //   });
+  };
+
+  const sendFile = async (uri) => {
+    fetch(`${Backend_URL}messages/create/${Id}/${member}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        message: uri,
+        type: "file",
+      }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Could not send  message");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        //console.log(data);
+        setNewMessage(data);
+        setTextMessage({ message: "", type: "text" });
+        socket.emit("chat-message", { ...data, receiverId: member });
+        fetchMessages();
+      })
+      .catch((err) => {
+        Alert.alert(err.message);
       });
   };
 
@@ -228,15 +300,12 @@ const ChatScreen = ({ route }) => {
   };
 
   const deleteMessage = async (messageId) => {
-    fetch(
-      `http://10.132.62.10:8800/api/messages/delete/${Id}/${chatId}/${messageId}`,
-      {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    )
+    fetch(`${Backend_URL}messages/delete/${Id}/${chatId}/${messageId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
       .then((response) => {
         if (!response.ok) {
           throw new Error("Could not delete message");
@@ -255,14 +324,8 @@ const ChatScreen = ({ route }) => {
   const pickDocument = async () => {
     try {
       const result = await DocumentPicker.getDocumentAsync({ type: "*/*" }); // Pick any type of file
-
-      // if (result.type === "success") {
-      Alert.alert(result);
-      // Handle the selected document
-      // console.log(result.uri);
-      // Example: You can save it to media state or handle it as needed
-      //setMedia([...media, { uri: result.uri }]); // Adding selected media to state
-      // }
+      console.log(result);
+      upLoadFile(result.uri, result.name, result.mimeType);
     } catch (error) {
       console.log("Document picker error:", error);
     }
@@ -343,13 +406,24 @@ const ChatScreen = ({ route }) => {
                     user={user}
                   />
                 </TouchableOpacity>
+              ) : item.type === "media" ? (
+                <TouchableOpacity onLongPress={() => handleLongPress(item._id)}>
+                  <MediaList
+                    uri={item.message}
+                    message={item}
+                    userId={Id}
+                    user={user}
+                  />
+                </TouchableOpacity>
               ) : (
-                <MediaList
-                  uri={item.message}
-                  message={item}
-                  userId={Id}
-                  user={user}
-                />
+                <TouchableOpacity>
+                  <FileList
+                    uri={item.message}
+                    message={item}
+                    userId={Id}
+                    user={user}
+                  />
+                </TouchableOpacity>
               )
             }
             keyExtractor={(item) => item._id}

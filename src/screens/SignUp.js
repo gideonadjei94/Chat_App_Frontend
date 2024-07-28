@@ -15,6 +15,7 @@ import ImageButton from "../../components_home/ImageButton";
 import FormField from "../../components_home/FormField";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
+import { Backend_URL } from "../auth/config";
 
 const SignUp = () => {
   const navigation = useNavigation();
@@ -56,7 +57,7 @@ const SignUp = () => {
   // };
 
   const registerUser = async () => {
-    fetch("http://10.132.62.10:8800/api/user/register", {
+    fetch(`${Backend_URL}user/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

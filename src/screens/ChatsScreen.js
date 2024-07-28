@@ -16,6 +16,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import { FontAwesome5 } from "@expo/vector-icons";
 import ProfileView from "../components/ProfileView";
+import { Backend_URL } from "../auth/config";
 
 const ChatsScreen = ({ route }) => {
   const { userId, user } = route.params;
@@ -24,7 +25,7 @@ const ChatsScreen = ({ route }) => {
   const [stories, setStories] = useState([]);
 
   const fetchChats = async () => {
-    fetch(`http://10.132.62.10:8800/api/chats/getchats/${userId}`, {
+    fetch(`${Backend_URL}chats/getchats/${userId}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -44,7 +45,7 @@ const ChatsScreen = ({ route }) => {
       });
   };
   const fetchStories = async () => {
-    fetch("http://10.132.62.10:8800/api/stories/story", {
+    fetch(`${Backend_URL}stories/story`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
