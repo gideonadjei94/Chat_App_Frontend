@@ -10,7 +10,7 @@ import React, { useRef, useState } from "react";
 import { Video } from "expo-av";
 import { Image } from "expo-image";
 import { FontAwesome5 } from "@expo/vector-icons";
-import PhotoView from "react-native-photo-view";
+
 import { useNavigation } from "@react-navigation/native";
 import * as MediaLibrary from "expo-media-library";
 

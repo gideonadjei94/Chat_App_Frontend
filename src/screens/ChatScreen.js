@@ -29,6 +29,7 @@ import * as DocumentPicker from "expo-document-picker";
 import MediaList from "../components/MediaList";
 import axios from "axios";
 import { Backend_URL, Api } from "../auth/config";
+import FileList from "../components/FileList.js";
 
 const ChatScreen = ({ route }) => {
   const { chatId, name, Id, member, user } = route.params;

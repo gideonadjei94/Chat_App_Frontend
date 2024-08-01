@@ -1,4 +1,4 @@
-package com.wexy
+package com.wexy.wexy
 
 import android.os.Build
 import android.os.Bundle

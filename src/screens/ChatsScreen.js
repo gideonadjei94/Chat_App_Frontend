@@ -65,6 +65,7 @@ const ChatsScreen = ({ route }) => {
   };
   useEffect(() => {
     fetchStories();
+    Alert.alert("Message", userId);
   }, []);
 
   const actions = [

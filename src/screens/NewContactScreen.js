@@ -6,10 +6,10 @@ import {
   StyleSheet,
   Alert,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Ionicons, FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import { FontAwesome5 } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { Backend_URL } from "../auth/config";
 
 const NewContactScreen = ({ route }) => {
@@ -45,6 +45,11 @@ const NewContactScreen = ({ route }) => {
         Alert.alert("Error", error.message);
       });
   };
+
+  // useEffect(() => {
+  //   Alert.alert("Messsage", user._id);
+  // });
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
